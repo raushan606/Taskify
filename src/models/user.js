@@ -1,65 +1,68 @@
 const mongoose = require("mongoose");
-const validator = require('validator')
+const validator = require("validator");
+const bcrypt = require("bcrypt");
 
-
-
-
-
-const User = mongoose.model("User", {
-    name: {
-      type: String,
-      required: true,
-      trim: true
-    },
-    email: {
-        type: String,
-        required: true,
-        trim: true,
-        lowercase: true,
-        validate(value) {
-          if (!validator.isEmail(value)) {
-              throw new Error('Email is Invalid')
-          }
-        }
-    },
-    password: {
-        type: String,
-        required: true,
-        minlength: 7,
-        trim: true,
-        validate(value) {
-            if (value.toLowerCase().includes('password')) {
-                throw new Error('Password cannot contain "password"')
-            }
-        }
-  
-    },
-    age: {
-      type: Number,
-      default: 0,
-      validate(value) {
-          if (value < 0) {
-              throw new Error('Age must be Positive Number')
-          }
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  email: {
+    type: String,
+    required: true,
+    trim: true,
+    lowercase: true,
+    validate(value) {
+      if (!validator.isEmail(value)) {
+        throw new Error("Email is Invalid");
       }
     }
-  });
+  },
+  password: {
+    type: String,
+    required: true,
+    minlength: 7,
+    trim: true,
+    validate(value) {
+      if (value.toLowerCase().includes("password")) {
+        throw new Error('Password cannot contain "password"');
+      }
+    }
+  },
+  age: {
+    type: Number,
+    default: 0,
+    validate(value) {
+      if (value < 0) {
+        throw new Error("Age must be Positive Number");
+      }
+    }
+  }
+});
 
-  module.exports = User
+userSchema.pre("save", async function(next) {
+  const user = this;
 
+  if (user.isModified("password")) {
+    user.password = await bcrypt.hash(user.password, 8);
+  }
 
+  // console.log('just beforing saving')
 
+  next();
+});
 
+const User = mongoose.model("User", userSchema);
 
+module.exports = User;
 
-  
 // const me = new User({
 //     name: '   Raushan Kumar    ',
 //     email: 'rk@gmail.com',
-//     age: 23, 
+//     age: 23,
 //     password: '1475654@123'
-   
-    
+
 // })
 
 // me.save().then(() => {
