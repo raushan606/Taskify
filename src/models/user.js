@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
-const jwt = require('jsonwebtoken')
+const jwt = require("jsonwebtoken");
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -41,38 +41,49 @@ const userSchema = new mongoose.Schema({
       }
     }
   },
-  tokens: [{
-    token:{
-      type: String,
-    required: true
+  tokens: [
+    {
+      token: {
+        type: String,
+        required: true
+      }
     }
-  }]
+  ]
 });
 
+userSchema.methods.toJSON = function() {
+  const user = this;
+  const userObject = user.toObject();
+
+  delete userObject.password
+  delete userObject.tokens
+
+  return userObject;
+};
+
 userSchema.methods.generateAuthToken = async function() {
-  const user = this
-  const token = jwt.sign({_id: user._id.toString()}, 'thisismynewcourse')
+  const user = this;
+  const token = jwt.sign({ _id: user._id.toString() }, "thisismynewcourse");
 
-  user.tokens = user.tokens.concat({ token })
-  await user.save()
-  return token
-
-}
+  user.tokens = user.tokens.concat({ token });
+  await user.save();
+  return token;
+};
 
 userSchema.statics.findByCredentials = async (email, password) => {
-  const user = await User.findOne({ email })
+  const user = await User.findOne({ email });
 
   if (!user) {
-    throw new Error('Unable to Login')
+    throw new Error("Unable to Login");
   }
 
-  const isMatch = await bcrypt.compare(password, user.password)
+  const isMatch = await bcrypt.compare(password, user.password);
 
   if (!isMatch) {
-    throw new Error('Unable to Login')
+    throw new Error("Unable to Login");
   }
-  return user
-}
+  return user;
+};
 
 //Hash the plain text password before saving
 

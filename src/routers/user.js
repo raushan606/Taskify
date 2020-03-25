@@ -26,7 +26,6 @@ router.post("/users/signup", async (req, res) => {
   } catch (e) {}
 });
 
-
 // --- POST ---
 
 router.post("/users/login", async (req, res) => {
@@ -46,35 +45,33 @@ router.post("/users/login", async (req, res) => {
 
 // --- POST ---
 
-router.post('/users/logout', auth, async(req, res) => {
-  try{
-    req.user.tokens = req.user.tokens.filter((token) => {
-      return token.token !== req.token
-    })
-    await req.user.save()
-    res.send()
-  } catch(e) {
-    res.status(500).send()
+router.post("/users/logout", auth, async (req, res) => {
+  try {
+    req.user.tokens = req.user.tokens.filter(token => {
+      return token.token !== req.token;
+    });
+    await req.user.save();
+    res.send();
+  } catch (e) {
+    res.status(500).send();
   }
-})
+});
 
 // --- POST ---
-router.post('/users/logoutAll', auth, async(req, res) => {
-  try{
-    req.user.tokens = []
-    await req.user.save()
-    res.send()
-  } catch(e) {
-    res.status(500).send()
+router.post("/users/logoutAll", auth, async (req, res) => {
+  try {
+    req.user.tokens = [];
+    await req.user.save();
+    res.send();
+  } catch (e) {
+    res.status(500).send();
   }
-})
+});
 
 // --- GET ---
 
 router.get("/users/me", auth, async (req, res) => {
- 
-  res.send(req.user)
-
+  res.send(req.user);
 });
 
 // --- GET ---
@@ -126,7 +123,7 @@ router.patch("/users/:id", async (req, res) => {
   }
 });
 
-// --- DELETE --- 
+// --- DELETE ---
 
 router.delete("/users/:id", async (req, res) => {
   try {
