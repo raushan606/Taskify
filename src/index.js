@@ -6,34 +6,11 @@ const taskRouter = require("./routers/task");
 const app = express();
 const port = process.env.PORT || 3000;
 
-const multer = require("multer");
-
-const upload = multer({
-  dest: "images",
-  limits: {
-    fileSize: 5000000
-  },
-  fileFilter(req, file, cb) {
-    if (!file.originalname.match(/\.(pdf)$/)) {
-      return cb(new Error("Please upload a PDF"));
-    }
-    cb(undefined, true);
-  }
-});
-
-
-app.post("/upload", upload.single('upload'), (req, res) => {
-  res.send();
-}, (error, req, res, next) => {
-  res.status(400).send({error: error.message })
-});
-
 app.use(express.json());
 app.use(userRouter);
 app.use(taskRouter);
 
 // without middleware: new request -> run route handler
-
 // with Middleware: new request -> do something -> run route handler
 
 app.listen(port, () => {
